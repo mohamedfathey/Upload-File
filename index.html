@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Story</title>
+    <script>
+        function uploadStory() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('file');
+            const idInput = document.getElementById('id');
+            const pathFileInput = document.getElementById('pathFile');
+            
+            formData.append('file', fileInput.files[0]);
+            formData.append('id', idInput.value);
+            formData.append('pathFile', pathFileInput.value);
+
+            fetch('/story/uploads', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // عرض الرسالة
+                document.getElementById('message').innerText = data;
+                
+                // عرض الصورة المحملة
+                const image = document.createElement('img');
+                const fileName = fileInput.files[0].name;
+                image.src = `/uploads/path/${fileName}`; // ضبط المسار المناسب للعرض
+                image.id = 'uploadedImage';
+                document.getElementById('imageContainer').appendChild(image);
+
+                // اخفاء الصورة بعد 4 ثواني
+                setTimeout(() => {
+                    const img = document.getElementById('uploadedImage');
+                    if (img) {
+                        img.style.display = 'none';
+                    }
+                }, 40000); // 4 ثواني
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+    <h2>Upload a Story</h2>
+    
+    <input type="file" id="file" />
+    <input type="text" id="id" placeholder="Enter story ID" />
+    <input type="text" id="pathFile" placeholder="Enter path type" />
+    <button onclick="uploadStory()">Upload Story</button>
+
+    <div id="message"></div>
+    <div id="imageContainer"></div>
+</body>
+</html>
